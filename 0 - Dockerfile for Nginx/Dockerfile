@@ -1,5 +1,8 @@
 FROM nginx:1.29
 
-RUN apt-get update
+RUN apt-get update && \
+    apt-get install -y vim && \
+    apt-get clean
 
-RUN apt-get install -y vim
+COPY index.html /usr/share/nginx/html/index.html
+RUN chown -R nginx:nginx /usr/share/nginx/html/index.html
