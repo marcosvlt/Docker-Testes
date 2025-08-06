@@ -1,5 +1,4 @@
-
-# Índice
+# Index
 
 - [Logging Into DockerHub in the Docker CLI](#logging-into-dockerhub-in-the-docker-cli)
     - [1. Creating an account](#1-creating-an-account)
@@ -18,20 +17,11 @@
     - [7. Repository Management](#7-repository-management)
     - [8. Pro Tip](#8-pro-tip)
 - [Dockerfile Overview – Notes](#dockerfile-overview--notes)
-    - [O que é um Dockerfile?](#what-is-a-dockerfile)
+    - [What is a Dockerfile?](#what-is-a-dockerfile)
     - [Dockerfile Structure](#dockerfile-structure)
     - [Benefits of Dockerfiles](#benefits-of-dockerfiles)
     - [Docker’s Layered Architecture](#dockers-layered-architecture)
     - [Key Insight](#key-insight)
-- [Dockerfile Practice: Automating Nginx Customization](#dockerfile-practice-automating-nginx-customization)
-    - [Objective](#objective)
-    - [Steps](#steps)
-    - [Dockerfile Contents](#dockerfile-contents)
-    - [Build the Docker Image](#build-the-docker-image)
-    - [Run the Container](#run-the-container)
-    - [Clean Up and Retag (Optional)](#clean-up-and-retag-optional)
-    - [Key Concepts Highlighted](#key-concepts-highlighted)
-
 ---
 
 # Logging Into DockerHub in the Docker CLI
