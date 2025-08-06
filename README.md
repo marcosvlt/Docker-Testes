@@ -2,7 +2,7 @@
 # Índice
 
 - [Logging Into DockerHub in the Docker CLI](#logging-into-dockerhub-in-the-docker-cli)
-    - [1. Criando uma Conta](#1-creating-an-account)
+    - [1. Creating an account](#1-creating-an-account)
     - [2. Docker CLI Login](#2-docker-cli-login)
     - [3. Search and Pull Images via CLI](#3-search-and-pull-images-via-cli)
     - [4. Image Versioning Behavior](#4-image-versioning-behavior)
