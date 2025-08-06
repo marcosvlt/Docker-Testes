@@ -1,22 +1,31 @@
 
-# Index
+# 📚 Index
 
 - [Key Concepts: Multi-Stage Builds in Docker](#key-concepts-multi-stage-builds-in-docker)
-    - [Problem](#problem)
-    - [Solution: Multi-Stage Builds](#solution-multi-stage-builds)
-    - [What Are Multi-Stage Builds?](#what-are-multi-stage-builds)
-    - [Benefits](#benefits)
-    - [Example: Multi-Stage Dockerfile (for Node.js App)](#example-multi-stage-dockerfile-for-nodejs-app)
-    - [How it Works](#how-it-works)
-    - [Build & Run Example](#build--run-example)
-    - [Key Point](#key-point)
+  - [❗Problem](#problem)
+  - [🛠 Solution: Multi-Stage Builds](#solution-multi-stage-builds)
+  - [What Are Multi-Stage Builds?](#what-are-multi-stage-builds)
+  - [🚀 Benefits](#benefits)
+  - [Example: Multi-Stage Dockerfile (for Node.js App)](#example-multi-stage-dockerfile-for-nodejs-app)
+  - [How it Works](#how-it-works)
+  - [🧪 Build & Run Example](#build--run-example)
+  - [💡 Key Point](#key-point)
 - [Integrating TypeScript into a Node.js Project with Docker Multi-Stage Builds](#integrating-typescript-into-a-nodejs-project-with-docker-multi-stage-builds)
-    - [Introduction](#introduction)
-    - [1. Setting Up TypeScript](#1-setting-up-typescript)
-    - [2. Converting JavaScript to TypeScript](#2-converting-javascript-to-typescript)
-    - [3. Build and Run the Application](#3-build-and-run-the-application)
-    - [4. Key Notes on Running TypeScript](#4-key-notes-on-running-typescript)
-    - [5. Summary of Changes Made](#5-summary-of-changes-made)
+  - [Introduction](#introduction)
+  - [1. Setting Up TypeScript](#1-setting-up-typescript)
+  - [2. Converting JavaScript to TypeScript](#2-converting-javascript-to-typescript)
+  - [3. Build and Run the Application](#3-build-and-run-the-application)
+  - [4. Key Notes on Running TypeScript](#4-key-notes-on-running-typescript)
+  - [5. Summary of Changes Made](#5-summary-of-changes-made)
+- [Updating Dockerfile for a TypeScript Project with Multi-Stage Builds](#updating-dockerfile-for-a-typescript-project-with-multi-stage-builds)
+  - [Overview](#overview)
+  - [1. Ignore Local Build Artifacts](#1-ignore-local-build-artifacts)
+  - [2. Modify Dockerfile for TypeScript Build](#2-modify-dockerfile-for-typescript-build)
+  - [3. Build and Run the Container](#3-build-and-run-the-container)
+  - [4. Why These Changes Matter](#4-why-these-changes-matter)
+  - [5. Understanding the Final CMD Instruction](#5-understanding-the-final-cmd-instruction)
+  - [6. Key Takeaways](#6-key-takeaways)
+  - [Conclusion](#conclusion)
 
 
 # Key Concepts: Multi-Stage Builds in Docker
@@ -243,6 +252,150 @@ console.log('Hello');  // Can be saved as .ts and run if no TypeScript features 
 - Configured TypeScript to output compiled files in the `dist/` directory.
     
 - Demonstrated that **only compiled JavaScript** should be run in production.
+    
+
+* * *
+
+&nbsp;
+
+# Updating Dockerfile for a TypeScript Project with Multi-Stage Builds
+
+## Overview
+
+This lesson focuses on adapting the **Dockerfile** to support **TypeScript** in a **multi-stage build** environment, compiling TypeScript into JavaScript, and running the app using a **Distroless Node.js 22 image**.
+
+* * *
+
+## 1\. Ignore Local Build Artifacts
+
+### Add `dist/` to `.dockerignore`
+
+Prevent local build artifacts from being copied into the Docker image to ensure a clean, repeatable build inside the container.
+
+```
+# .dockerignore
+dist/
+```
+
+* * *
+
+## 2\. Modify Dockerfile for TypeScript Build
+
+### Key Changes:
+
+- Add `COPY` for source code and `tsconfig.json` to the **build stage**.
+    
+- Add `RUN npm run build` to compile TypeScript.
+    
+- Copy the compiled `dist/` directory into the **Distroless runtime stage**.
+    
+
+### Updated Dockerfile Example
+
+```dockerfile
+# Stage 1: Build Stage
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY src src
+COPY tsconfig.json tsconfig.json
+
+RUN npm run build
+
+
+# Stage 2: Final Image using Distroless
+FROM gcr.io/distroless/nodejs
+WORKDIR /app
+COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/dist dist
+ENV PORT=3000
+
+CMD ["dist/index.js"]
+```
+
+* * *
+
+## 3\. Build and Run the Container
+
+### Build Image
+
+```bash
+docker build -t express-ts:0.0.1 .
+```
+
+### Run Container
+
+```bash
+docker run -d -p 3000:3000 express-ts:0.0.1
+```
+
+### Verify Application
+
+```bash
+curl http://localhost:3000
+# Expected Output: Hello from express
+```
+
+* * *
+
+## 4\. Why These Changes Matter
+
+### Ensuring Build Consistency
+
+- All compilation happens inside the container, making the build **independent of local machine setup**.
+    
+- Avoids relying on pre-built local files, ensuring **reproducibility**.
+    
+
+### Proper File Handling
+
+- `src/` and `tsconfig.json` are only needed in the build stage.
+    
+- Only `dist/` and `node_modules/` are included in the **final image**.
+    
+- Final image is **minimal and secure**, perfect for production.
+    
+
+* * *
+
+## 5\. Understanding the Final CMD Instruction
+
+### Default Distroless Behavior
+
+Distroless Node.js images have **Node.js as the default entrypoint**. Therefore:
+
+```dockerfile
+CMD ["dist/index.js"]
+```
+
+This effectively runs:
+
+```bash
+node dist/index.js
+```
+
+* * *
+
+## 6\. Key Takeaways
+
+| Step | Purpose |
+| --- | --- |
+| `.dockerignore` update | Avoid copying unnecessary local files |
+| Build stage additions | Compile TypeScript inside Docker |
+| Distroless stage copies | Only include production-ready files |
+| `CMD` update | Run compiled JavaScript via Node in Distroless |
+| Result | Clean, secure, efficient Docker image with TypeScript support |
+
+* * *
+
+## Conclusion
+
+- TypeScript integration introduces new **build-time steps**, but Docker multi-stage builds manage this efficiently.
+    
+- Final image remains **lean** and **secure**, using **Distroless** best practices.
+    
+- If any part is unclear, reviewing the build process in steps can help clarify.
     
 
 * * *
