@@ -1,4 +1,4 @@
-# 📑 Index
+# Index
 
 - [Optimizing Docker Images – Using Smaller Base Images](#optimizing-docker-images--using-smaller-base-images)
     - [Introduction](#introduction)
@@ -11,13 +11,14 @@
     - [7. Key Takeaways](#7-key-takeaways)
     - [Example: Compare Build Sizes](#example-compare-build-sizes)
     - [Conclusion](#conclusion)
-- [🐳 Docker Optimization: Instruction Ordering and Dependency Management](#-docker-optimization-instruction-ordering-and-dependency-management)
+- [Docker Optimization: Instruction Ordering and Dependency Management](#docker-optimization-instruction-ordering-and-dependency-management)
     - [Overview](#overview)
     - [1. Ordering Dockerfile Instructions](#1-ordering-dockerfile-instructions)
     - [2. Installing Only Production Dependencies](#2-installing-only-production-dependencies)
     - [Verifying the Difference](#verifying-the-difference)
     - [Bonus: Preparing for Multi-Stage Builds](#bonus-preparing-for-multi-stage-builds)
     - [Summary](#summary)
+
 # Optimizing Docker Images – Using Smaller Base Images
 
 ## Introduction
@@ -195,9 +196,9 @@ docker images
 Optimizing Docker images doesn’t mean chasing the smallest possible size at all costs. Instead, **choose the base image wisely**, leverage **Docker caching**, and aim for a **balance between performance, security, and maintainability**.
 
 
-# 🐳 Docker Optimization: Instruction Ordering and Dependency Management
+# Docker Optimization: Instruction Ordering and Dependency Management
 
-## 📌 Overview
+## Overview
 
 The lecture focuses on **two key techniques** to optimize Docker images for **faster builds**, **smaller image sizes**, and **improved security**:
 
@@ -208,9 +209,9 @@ The lecture focuses on **two key techniques** to optimize Docker images for **fa
 
 * * *
 
-## 🧱 1. Ordering Dockerfile Instructions
+## 1. Ordering Dockerfile Instructions
 
-### 🔑 Key Idea
+### Key Idea
 
 Docker builds images **layer by layer**. If a layer changes, **all subsequent layers are invalidated** in the cache.
 
@@ -218,7 +219,7 @@ Docker builds images **layer by layer**. If a layer changes, **all subsequent la
 
 > Put commands that change **least frequently** at the **top** of the Dockerfile, and the commands that change **most frequently** at the **bottom**.
 
-### ✅ Good Example (Optimized)
+### Good Example (Optimized)
 
 ```Dockerfile
 # Dockerfile.order
@@ -239,7 +240,7 @@ COPY . .
 CMD ["node", "index.js"]
 ```
 
-### ❌ Not So Good Example (Suboptimal)
+### Not So Good Example (Suboptimal)
 
 ```Dockerfile
 # Dockerfile.bad
@@ -256,11 +257,11 @@ RUN npm ci
 CMD ["node", "index.js"]
 ```
 
-### 🧠 Why It Matters
+### Why It Matters
 
 If `index.js` changes, the Docker layer cache for `COPY . .` breaks, forcing `npm ci` to re-run — **even if `package.json` didn't change**. This **slows down builds**.
 
-#### 🔄 Example Output
+#### Example Output
 
 - **Optimized Build (cached)**: `npm ci` takes **~0s**
     
@@ -269,9 +270,9 @@ If `index.js` changes, the Docker layer cache for `COPY . .` breaks, forcing `np
 
 * * *
 
-## 📦 2. Installing Only Production Dependencies
+## 2. Installing Only Production Dependencies
 
-### 🔑 Key Idea
+### Key Idea
 
 In Node.js, `package.json` differentiates between:
 
@@ -286,7 +287,7 @@ In Node.js, `package.json` differentiates between:
 npm ci --only=production
 ```
 
-### ✅ Good Dockerfile
+### Good Dockerfile
 
 ```Dockerfile
 # Dockerfile.deps.good
@@ -303,7 +304,7 @@ COPY . .
 CMD ["node", "index.js"]
 ```
 
-### ❌ Not So Good Dockerfile
+### Not So Good Dockerfile
 
 ```Dockerfile
 # Dockerfile.deps.bad
@@ -320,7 +321,7 @@ COPY . .
 CMD ["node", "index.js"]
 ```
 
-### 🧠 Why It Matters
+### Why It Matters
 
 - **Reduces image size**: e.g., ~50MB smaller
     
@@ -331,7 +332,7 @@ CMD ["node", "index.js"]
 
 * * *
 
-## 🧪 Verifying the Difference
+## Verifying the Difference
 
 To inspect installed modules inside the container:
 
@@ -344,7 +345,7 @@ ls node_modules
 
 * * *
 
-## 🧰 Bonus: Preparing for Multi-Stage Builds
+## Bonus: Preparing for Multi-Stage Builds
 
 If you need to **build (e.g., transpile TypeScript)** and then **run**, use **multi-stage builds**:
 
@@ -369,7 +370,7 @@ CMD ["src/index.js"]
 
 * * *
 
-## 📌 Summary
+## Summary
 
 | Technique | Benefit |
 | --- | --- |
