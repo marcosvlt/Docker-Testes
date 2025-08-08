@@ -1,35 +1,32 @@
-# 📚 Índice
+# Index
 
-1. [🚀 Quick Start: Express.js Hello World App](#-quick-start-expressjs-hello-world-app)
-    - [1. 📁 Setup: Create a New Project Directory](#1-setup-create-a-new-project-directory)
-    - [2. 📦 Initialize Node Project](#2-initialize-node-project)
-    - [3. 📥 Install Dependencies (with pinned versions)](#3-install-dependencies-with-pinned-versions)
-    - [4. 📝 Create `index.js` File](#4-create-indexjs-file)
-    - [5. ⚙️ Add Start Script to `package.json`](#5-add-start-script-to-packagejson)
-    - [6. ▶️ Run the Application](#6-run-the-application)
-    - [7. 🌐 Test Your Server](#7-test-your-server)
-    - [✅ Summary: What You Learned](#-summary-what-you-learned)
-2. [🚀 Updated Express.js App Code](#-updated-expressjs-app-code)
-    - [1. 📄 `index.js`](#1-indexjs)
-    - [🧪 How to Test (with Postman or cURL)](#-how-to-test-with-postman-or-curl)
-        - [Start the Server](#start-the-server)
-        - [📥 Register a User (POST)](#-register-a-user-post)
-        - [📤 Get Registered Users (GET)](#-get-registered-users-get)
-    - [📝 Key Concepts Used](#-key-concepts-used)
-3. [<span style="color: oklch(0.2974 0.0362 281.74);">Dockerize Our Express App</span>](#dockerize-our-express-app)
-    - [✅ Your App Directory Structure](#-your-app-directory-structure)
-    - [📄 Final Dockerfile (Clean Version)](#-final-dockerfile-clean-version)
-    - [💻 How to Build and Run](#-how-to-build-and-run)
-        - [1. Build the Docker Image](#1-build-the-docker-image)
-        - [2. Run the Docker Container](#2-run-the-docker-container)
-        - [3. Test it with cURL](#3-test-it-with-curl)
-    - [🔍 Key Concepts Recap](#-key-concepts-recap)
+- [Quick Start: Express.js Hello World App](#quick-start-expressjs-hello-world-app)
+    - [1. Setup: Create a New Project Directory](#1-setup-create-a-new-project-directory)
+    - [2. Initialize Node Project](#2-initialize-node-project)
+    - [3. Install Dependencies (with pinned versions)](#3-install-dependencies-with-pinned-versions)
+    - [4. Create `index.js` File](#4-create-indexjs-file)
+    - [5. Add Start Script to `package.json`](#5-add-start-script-to-packagejson)
+    - [6. Run the Application](#6-run-the-application)
+    - [7. Test Your Server](#7-test-your-server)
+    - [Summary: What You Learned](#summary-what-you-learned)
+- [Updated Express.js App Code](#updated-expressjs-app-code)
+    - [1. `index.js`](#1-indexjs)
+    - [How to Test (with Postman or cURL)](#how-to-test-with-postman-or-curl)
+        - [Register a User (POST)](#register-a-user-post)
+        - [Get Registered Users (GET)](#get-registered-users-get)
+    - [Key Concepts Used](#key-concepts-used)
+- [Dockerize Our Express App](#dockerize-our-express-app)
+    - [Your App Directory Structure](#your-app-directory-structure)
+    - [Final Dockerfile (Clean Version)](#final-dockerfile-clean-version)
+    - [How to Build and Run](#how-to-build-and-run)
+        - [Build the Docker Image](#1-build-the-docker-image)
+        - [Run the Docker Container](#2-run-the-docker-container)
+        - [Test it with cURL](#3-test-it-with-curl)
+    - [Key Concepts Recap](#key-concepts-recap)
 
-* * *
+# Quick Start: Express.js Hello World App
 
-# 🚀 Quick Start: Express.js Hello World App
-
-### 1\. 📁 Setup: Create a New Project Directory
+### 1\.  Setup: Create a New Project Directory
 
 ```bash
 mkdir containerize-express-app
@@ -38,7 +35,7 @@ cd containerize-express-app
 
 * * *
 
-### 2\. 📦 Initialize Node Project
+### 2\. Initialize Node Project
 
 ```bash
 npm init -y
@@ -48,7 +45,7 @@ You now have a `package.json` file.
 
 * * *
 
-### 3\. 📥 Install Dependencies (with pinned versions)
+### 3\. Install Dependencies (with pinned versions)
 
 ```bash
 npm install express@4.9.2 body-parser@1.20.2 --save-exact
@@ -65,7 +62,7 @@ You now have:
 
 * * *
 
-### 4\. 📝 Create `index.js` File
+### 4\. Create `index.js` File
 
 ```js
 const express = require('express');
@@ -90,7 +87,7 @@ app.listen(port, () => {
 
 * * *
 
-### 5\. ⚙️ Add Start Script to `package.json`
+### 5\. Add Start Script to `package.json`
 
 Add under `"scripts"` section:
 
@@ -102,7 +99,7 @@ Add under `"scripts"` section:
 
 * * *
 
-### 6\. ▶️ Run the Application
+### 6\. Run the Application
 
 ```bash
 npm start
@@ -116,7 +113,7 @@ Server listening on port 3000
 
 * * *
 
-### 7\. 🌐 Test Your Server
+### 7\. Test Your Server
 
 In a new terminal:
 
@@ -132,7 +129,7 @@ Hello world
 
 * * *
 
-### ✅ Summary: What You Learned
+### Summary: What You Learned
 
 | Step | Tool/Command | Purpose |
 | --- | --- | --- |
@@ -143,13 +140,7 @@ Hello world
 
 * * *
 
-&nbsp;
-
-Here's a **clear summary** of what you've done and a cleaned-up version of your **Express.js app with two routes**: one for **registering users** and another for **retrieving all registered users**.
-
-* * *
-
-# 🚀 Updated Express.js App Code
+# Updated Express.js App Code
 
 ### 1\. 📄 `index.js`
 
@@ -194,7 +185,7 @@ app.listen(port, () => {
 
 * * *
 
-### 🧪 How to Test (with Postman or cURL)
+### How to Test (with Postman or cURL)
 
 ### Start the Server
 
@@ -204,7 +195,7 @@ npm start
 
 * * *
 
-### 📥 Register a User (POST)
+### Register a User (POST)
 
 **Endpoint:** `POST http://localhost:3000/users`  
 **Request Body (JSON):**
@@ -224,7 +215,7 @@ npm start
 
 * * *
 
-### 📤 Get Registered Users (GET)
+### Get Registered Users (GET)
 
 **Endpoint:** `GET http://localhost:3000/users`  
 **Response:**
@@ -235,7 +226,7 @@ npm start
 
 * * *
 
-### 📝 Key Concepts Used
+### Key Concepts Used
 
 | Concept | Code Used | Purpose |
 | --- | --- | --- |
@@ -252,7 +243,7 @@ npm start
 
 * * *
 
-## ✅ Your App Directory Structure
+## Your App Directory Structure
 
 ```
 ContainerizeExpressApp/
@@ -287,7 +278,7 @@ Update package.json
 
 * * *
 
-## 📄 Final Dockerfile (Clean Version)
+## Final Dockerfile (Clean Version)
 
 ```Dockerfile
 # Base image: Node.js version 22
@@ -314,7 +305,7 @@ CMD ["node", "index.js"]
 
 * * *
 
-## 💻 How to Build and Run
+## How to Build and Run
 
 ### 1\. Build the Docker Image
 
@@ -345,7 +336,7 @@ docker run -d -p 3000:3000 --name express_app express_app:v0.0.1
 
 * * *
 
-## 🔍 Key Concepts Recap
+## Key Concepts Recap
 
 | Step | Command/Concept | Purpose |
 | --- | --- | --- |
@@ -359,4 +350,3 @@ docker run -d -p 3000:3000 --name express_app express_app:v0.0.1
 
 * * *
 
-&nbsp;
