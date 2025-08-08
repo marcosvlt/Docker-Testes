@@ -1,15 +1,15 @@
-
-# 📚 Index
+# Index
 
 - [Key Concepts: Multi-Stage Builds in Docker](#key-concepts-multi-stage-builds-in-docker)
-  - [❗Problem](#problem)
-  - [🛠 Solution: Multi-Stage Builds](#solution-multi-stage-builds)
+  - [Problem](#problem)
+  - [Solution: Multi-Stage Builds](#solution-multi-stage-builds)
   - [What Are Multi-Stage Builds?](#what-are-multi-stage-builds)
-  - [🚀 Benefits](#benefits)
+  - [Benefits](#benefits)
   - [Example: Multi-Stage Dockerfile (for Node.js App)](#example-multi-stage-dockerfile-for-nodejs-app)
   - [How it Works](#how-it-works)
-  - [🧪 Build & Run Example](#build--run-example)
-  - [💡 Key Point](#key-point)
+  - [Build & Run Example](#build--run-example)
+  - [Key Point](#key-point)
+
 - [Integrating TypeScript into a Node.js Project with Docker Multi-Stage Builds](#integrating-typescript-into-a-nodejs-project-with-docker-multi-stage-builds)
   - [Introduction](#introduction)
   - [1. Setting Up TypeScript](#1-setting-up-typescript)
@@ -17,6 +17,7 @@
   - [3. Build and Run the Application](#3-build-and-run-the-application)
   - [4. Key Notes on Running TypeScript](#4-key-notes-on-running-typescript)
   - [5. Summary of Changes Made](#5-summary-of-changes-made)
+
 - [Updating Dockerfile for a TypeScript Project with Multi-Stage Builds](#updating-dockerfile-for-a-typescript-project-with-multi-stage-builds)
   - [Overview](#overview)
   - [1. Ignore Local Build Artifacts](#1-ignore-local-build-artifacts)
@@ -27,12 +28,21 @@
   - [6. Key Takeaways](#6-key-takeaways)
   - [Conclusion](#conclusion)
 
+- [Optimizing a Multi-Stage Dockerfile for Node.js (Express)](#optimizing-a-multi-stage-dockerfile-for-nodejs-express)
+  - [Objective](#objective)
+  - [Current Good Practices](#current-good-practices)
+  - [Problem](#problem-1)
+  - [Solution: Introduce a Dependencies Stage](#solution-introduce-a-dependencies-stage)
+  - [How Docker Handles This](#how-docker-handles-this)
+  - [Testing the Image](#testing-the-image)
+  - [Final Thoughts](#final-thoughts)
+  - [Congratulations](#congratulations)
 
 # Key Concepts: Multi-Stage Builds in Docker
 
 * * *
 
-## ❗Problem:
+## Problem:
 
 - When using **Distroless images** for better security and smaller size, you **cannot install dependencies** like `npm`, because tools like `npm` or shell utilities do not exist in distroless images.
     
@@ -54,7 +64,7 @@
 
 * * *
 
-## 🚀 Benefits:
+##  Benefits:
 
 | Benefit | Description |
 | --- | --- |
@@ -106,7 +116,7 @@ CMD ["src/index.js"]
 
 * * *
 
-## 🧪 Build & Run Example
+##  Build & Run Example
 
 ```bash
 docker build -t express-multistage .
@@ -115,7 +125,7 @@ docker run -p 3000:3000 express-multistage
 
 * * *
 
-## 💡 Key Point:
+##  Key Point:
 
 You **can’t use Distroless for building**, only for running.  
 Multi-stage builds allow you to **build in one stage** and then **run in a secure, minimal environment**.
@@ -398,4 +408,157 @@ node dist/index.js
 - If any part is unclear, reviewing the build process in steps can help clarify.
     
 
+&nbsp;
+
+##  Optimizing a Multi-Stage Dockerfile for Node.js (Express)
+
+###  Objective
+
+Improve an existing Dockerfile by:
+
+- Separating **build** and **production dependencies**.
+    
+- Using **multi-stage builds** for better **Docker cache** utilization and **smaller image sizes**.
+    
+- Creating a final, minimal, and secure **Distroless image**.
+    
+
 * * *
+
+##  Current Good Practices
+
+- **Multi-stage builds** already in use.
+    
+- **Dependency files (`package.json`, `package-lock.json`)** are copied early to leverage Docker’s layer caching.
+    
+- `npm ci` is used, which is more cache-friendly than `npm install`.
+    
+- `npm run build` is used to compile TypeScript to JavaScript in a `dist/` folder.
+    
+- Final image is based on **Distroless**, enhancing security.
+    
+
+* * *
+
+##  Problem
+
+The build stage installs **all dependencies**, including **devDependencies**. These are not required at runtime and unnecessarily bloat the final image.
+
+* * *
+
+## Solution: Introduce a Dependencies Stage
+
+### 1\. Add a `dependencies` stage:
+
+Installs only **production dependencies** using `npm ci --only=production`.
+
+```dockerfile
+# Stage 1: Dependencies
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+```
+
+* * *
+
+### 2\. Build stage remains the same:
+
+Builds the TypeScript project (needs full dependencies including dev tools).
+
+```dockerfile
+# Stage 2: Build
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY . .
+RUN npm ci
+RUN npm run build
+```
+
+* * *
+
+### 3\. Final stage using Distroless:
+
+Includes only the compiled JS (`dist/`) and runtime dependencies (`node_modules` from deps stage).
+
+```dockerfile
+# Stage 3: Final - Distroless
+FROM gcr.io/distroless/nodejs:22
+WORKDIR /app
+
+# Copy runtime dependencies
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy compiled source code
+COPY --from=build /app/dist ./dist
+
+CMD ["dist/index.js"]
+```
+
+* * *
+
+##  How Docker Handles This
+
+- Docker runs **`deps`** and **`build`** stages **in parallel**.
+    
+- `build` stage compiles source and outputs to `dist/`.
+    
+- `deps` stage installs only necessary production packages.
+    
+- The **final image** copies:
+    
+    - `node_modules/` from `deps`
+        
+    - `dist/` from `build`
+        
+- This results in:
+    
+    - Smaller image
+        
+    - More secure runtime (no dev tools or source code)
+        
+    - Faster builds (via caching)
+        
+
+* * *
+
+##  Testing the Image
+
+### 1\. Build the image
+
+```bash
+docker build -t express-rts .
+```
+
+### 2\. Run the container
+
+```bash
+docker run --rm -d -p 3000:3000 express-rts
+```
+
+### 3\. Test the app
+
+```bash
+curl http://localhost:3000
+# Output: Hello from express
+```
+
+* * *
+
+## Final Thoughts
+
+This optimized Dockerfile:
+
+- Is **clean**, **modular**, and **production-ready**.
+    
+- **Minimizes attack surface** using **Distroless**.
+    
+- Separates **build tools** from **runtime**, following **Docker best practices**.
+    
+
+* * *
+
+## Congratulations
+
+You’ve now mastered a professional Dockerfile setup using multi-stage builds, dependency separation, and production-optimized images.
+
