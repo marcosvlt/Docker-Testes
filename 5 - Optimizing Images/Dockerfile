@@ -1,8 +1,16 @@
-FROM node:22-alpine
+# First stage: build
+FROM node:22 AS build
+
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY src/ src/
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Stage 2: Final Image using Distroless
+FROM gcr.io/distroless/nodejs
+WORKDIR /app
+COPY --from=build /app/node_modules node_modules
+COPY --from=build /app/src src
 
-COPY index.js ./
-CMD ["node", "index.js"]
+
+CMD ["src/index.js"]
