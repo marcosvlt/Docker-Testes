@@ -14,7 +14,18 @@ if docker ps --format '{{.Names}}' | grep -Eq "^${CONTAINER_NAME}\$"; then
     docker stop "$CONTAINER_NAME"
     docker rm "$CONTAINER_NAME"
 else
-    echo "Container $CONTAINER_NAME is not running. No need to stop."
+    echo "Container $CONTAINER_NAME is not running. Removing it anyway..."
+    docker rm "$CONTAINER_NAME"
+fi
+
+#check if backend container is running
+if docker ps --format '{{.Names}}' | grep -Eq "^${BACKEND_CONTAINER_NAME}\$"; then
+    echo "Stopping and removing backend container $BACKEND_CONTAINER_NAME..."
+    docker stop "$BACKEND_CONTAINER_NAME"
+    docker rm "$BACKEND_CONTAINER_NAME"
+else
+    echo "Backend container $BACKEND_CONTAINER_NAME is not running. Removing it anyway..."
+    docker rm "$BACKEND_CONTAINER_NAME"
 fi
 
 #check if docker network already exists
